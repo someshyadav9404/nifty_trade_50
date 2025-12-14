@@ -48,16 +48,16 @@ def global_shap_random_forest(X):
 
     # shap_values is a list: [class0, class1, class2]
     shap_values = explainer.shap_values(X_sample)
-    print(shap_values)
+    print(shap_values.shape)
 
     # Aggregate across classes → keep sample dimension
     shap_global = np.mean(
         np.abs(np.stack(shap_values, axis=0)),
-        axis=0
+        axis=2
     )  # shape: (n_samples, n_features)
 
     print("dfbdb")
-    print(shap_global)
+    print(shap_global.shape)
     shap.summary_plot(
         shap_global,
         X_sample,
@@ -74,41 +74,35 @@ def global_shap_xgboost(X):
 
     xgb_model = joblib.load(XGB_MODEL_PATH)
 
-    # Use limited background for stability
-    bg_size = min(50, X.shape[0])
-    background = X[np.random.choice(X.shape[0], size=bg_size, replace=False)]
-
-    explainer = shap.KernelExplainer(
-        xgb_model.predict_proba,
-        background
-    )
-
-    # Use subset for SHAP computation to keep runtime reasonable
+    # Subsample for speed
     sample_size = min(200, X.shape[0])
     X_sample = X[:sample_size]
 
-    shap_values = []
+    # Tree SHAP (correct explainer)
+    explainer = shap.TreeExplainer(xgb_model)
+    shap_values = explainer.shap_values(X_sample)
 
-    print("Running SHAP KernelExplainer (this may take time)...")
-    for i in tqdm(range(X_sample.shape[0]), desc="XGBoost SHAP Progress"):
-        shap_val = explainer.shap_values(X_sample[i:i+1], nsamples=100)
-        shap_values.append(shap_val)
+    # ---- Handle multiclass output ----
+    if isinstance(shap_values, list):
+        # list[class] -> (samples, features)
+        shap_values = np.stack(shap_values, axis=2)  # (samples, features, classes)
 
-    # Convert list → array
-    shap_values = np.array(shap_values)
+    print("SHAP values shape:", shap_values.shape)
 
-    # Aggregate across samples and classes
-    shap_global = np.mean(np.abs(shap_values), axis=(0, 1))
+    # Global importance: mean |SHAP| over samples and classes
+    shap_global = np.mean(np.abs(shap_values), axis=(0, 2))  # (features,)
 
-    shap.summary_plot(
+    # Plot global importance
+    shap.bar_plot(
         shap_global,
-        X_sample,
         feature_names=FEATURE_COLS,
-        show=True
+        show=False
     )
 
-    print("XGBoost SHAP completed.")
+    plt.savefig("xgb_global_shap.png", dpi=300, bbox_inches="tight")
+    plt.close()
 
+    print("XGBoost Tree SHAP completed.")
 
 def main():
     X = load_data()
