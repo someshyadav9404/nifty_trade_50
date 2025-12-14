@@ -10,7 +10,7 @@ def train_models():
     df = pd.read_csv("data/labeled/nifty_labeled.csv")
     df = df.dropna()
 
-    X = df.drop(columns=["label", "Date"])
+    X = df.drop(columns=["label","next_ret", "Date"])
     y = df["label"]
 
     print(X)

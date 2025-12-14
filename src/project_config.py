@@ -28,7 +28,6 @@ FEATURE_COLS = [
     "ma_diff",
     "vol_20",
     "momentum",
-    "next_ret",
 ]
 
 

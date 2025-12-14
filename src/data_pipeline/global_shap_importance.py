@@ -65,7 +65,8 @@ def global_shap_random_forest(X):
         show=False
     )
     plt.show()
-
+    plt.savefig("rf_global_shap.png", dpi=300, bbox_inches="tight")
+    plt.close() 
 
     print("Random Forest Kernel SHAP completed.")
 
