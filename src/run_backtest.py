@@ -1,36 +1,89 @@
 import pandas as pd
+import numpy as np
 import joblib
+import matplotlib.pyplot as plt
 from backtesting.backtest import backtest_strategy
+import os
+os.makedirs("results", exist_ok=True)
+
+FEATURE_COLS = [
+    "Close",
+    "High",
+    "Low",
+    "Open",
+    "Volume",
+    "ret_1d",
+    "ma_5",
+    "ma_20",
+    "ma_diff",
+    "vol_20",
+    "momentum"
+]
 
 def run_backtest(model_path, model_name):
-    df = pd.read_csv("data/labeled/nifty_labeled.csv")
-    df = df.dropna()
+    # ---- Load data ----
+    df = pd.read_csv(
+        "data/labeled/nifty_labeled.csv",
+        parse_dates=["Date"]
+    ).dropna()
 
-    X = df.drop(columns=["label", "Date"])
-    y_true = df["label"]
+    df.set_index("Date", inplace=True)
 
+    # ---- Features ----
+    X = df[FEATURE_COLS]
+
+    # ---- Load model & predict ----
     model = joblib.load(model_path)
-
     preds = model.predict(X)
 
+    # ---- Run backtest ----
     results = backtest_strategy(df, preds)
 
-    # Convert output to a dataframe
+    # ---- Metrics table ----
     results_table = pd.DataFrame({
         "Model": [model_name],
         "Final Equity (₹)": [f"{results['final_equity']:.2f}"],
-        "Total Return (%)": [f"{results['total_return']:.2f}"],
+        "Total Return (%)": [f"{results['total_return_%']:.2f}"],
         "Sharpe Ratio": [f"{results['sharpe_ratio']:.2f}"],
-        "Max Drawdown (%)": [f"{results['max_drawdown']:.2f}"]
+        "Max Drawdown (%)": [f"{results['max_drawdown_%']:.2f}"]
     })
 
     print("\n===== Backtest Results =====")
     print(results_table.to_string(index=False))
 
-    # Optionally save table
-    # results_table.to_csv("results/backtest_results.csv", index=False)
+    # ---- Save equity curve ----
+    plt.figure(figsize=(10, 5))
+    plt.plot(results["equity_curve"])
+    plt.title(f"Equity Curve – {model_name}")
+    plt.xlabel("Time")
+    plt.ylabel("Portfolio Value")
+    plt.grid(True)
+    plt.savefig(f"results/equity_curve_{model_name}.png", dpi=300)
+    plt.close()
+
+    # ---- Save drawdown curve ----
+    plt.figure(figsize=(10, 3))
+    plt.plot(results["drawdown_curve"])
+    plt.title(f"Drawdown – {model_name}")
+    plt.ylabel("Drawdown")
+    plt.xlabel("Time")
+    plt.grid(True)
+    plt.savefig(f"results/drawdown_{model_name}.png", dpi=300)
+    plt.close()
+
+    # ---- Save trade log ----
+    results["trade_log"].to_csv(
+        f"results/trades_{model_name}.csv",
+        index=False
+    )
 
     return results_table
 
 if __name__ == "__main__":
-    run_backtest("models/random_forest.pkl", "Random Forest")
+    models = [
+        ("models/random_forest.joblib", "Random Forest"),
+        ("models/xgboost.joblib", "XGBoost")
+    ]
+
+    for model_path, model_name in models:
+        run_backtest(model_path, model_name)
