@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+
+# -----------------------------
+# Load filtered trades
+# -----------------------------
+df = pd.read_csv("artifacts/paper1/filtered_trades.csv")
+
+# Keep only approved trades
+df = df[df["keep"]].reset_index(drop=True)
+
+print("Executing trades:", len(df))
+
+# -----------------------------
+# Backtest parameters
+# -----------------------------
+COST = 0.001  # must match baseline
+
+equity = [1.0]
+
+# -----------------------------
+# Backtest loop
+# -----------------------------
+for i in range(len(df)):
+    net_ret = df.loc[i, "return"]
+    equity.append(equity[-1] * (1 + net_ret))
+
+equity = np.array(equity)
+
+# -----------------------------
+# Metrics
+# -----------------------------
+returns = np.diff(equity) / equity[:-1]
+
+sharpe = np.mean(returns) / (np.std(returns) + 1e-8) * np.sqrt(252)
+
+drawdown = equity / np.maximum.accumulate(equity) - 1
+max_dd = drawdown.min()
+
+print("Final equity:", equity[-1])
+print("Sharpe Ratio:", round(sharpe, 3))
+print("Max Drawdown:", round(max_dd, 3))

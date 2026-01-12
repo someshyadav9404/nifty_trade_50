@@ -4,7 +4,68 @@ import joblib
 import matplotlib.pyplot as plt
 from backtesting.backtest import backtest_strategy
 import os
-os.makedirs("results", exist_ok=True)
+
+def create_directory_structure():
+    """
+    Creates the project's directory structure starting from the home directory,
+    including all subdirectories and files (as empty files).
+    """
+    directories = [
+        "data",
+        "data/labeled",
+        "data/raw",
+        "models",
+        "results",
+        "src",
+        "src/backtesting",
+        "src/data_pipeline",
+        "src/model_training"
+    ]
+
+    files = [
+        ".gitignore",
+        "README.md",
+        "requirements.txt",
+        "rf_global_shap.png",
+        "xgb_global_shap.png",
+        "data/labeled/nifty_labeled.csv",
+        "data/raw/nifty_clean.csv",
+        "models/random_forest.joblib",
+        "models/xgboost.joblib",
+        "results/drawdown_Random Forest.png",
+        "results/drawdown_XGBoost.png",
+        "results/equity_curve_Random Forest.png",
+        "results/equity_curve_XGBoost.png",
+        "results/trades_Random Forest.csv",
+        "results/trades_XGBoost.csv",
+        "src/baselie_buy_hold.py",
+        "src/project_config.py",
+        "src/run_backtest.py",
+        "src/run_pipeline.py",
+        "src/backtesting/backtest.py",
+        "src/data_pipeline/feature_engineering.py",
+        "src/data_pipeline/fetch_data.py",
+        "src/data_pipeline/global_shap_importance.py",
+        "src/data_pipeline/label_data.py",
+        "src/data_pipeline/process_data.py",
+        "src/model_training/train_model.py"
+    ]
+
+    # Create directories
+    for dir_path in directories:
+        os.makedirs(dir_path, exist_ok=True)
+
+    # Create empty files
+    for file_path in files:
+        # Create parent directories if they don't exist (though they should from above)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        # Create empty file if it doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                pass  # Create empty file
+
+# Create the directory structure
+create_directory_structure()
 
 FEATURE_COLS = [
     "Close",

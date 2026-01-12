@@ -6,3 +6,4 @@ def add_features(df):
     df["vol_20"] = df["Close"].rolling(20).std()
     df["momentum"] = df["Close"] - df["Close"].shift(5)
     return df
+
