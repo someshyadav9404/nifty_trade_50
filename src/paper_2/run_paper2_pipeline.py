@@ -123,6 +123,12 @@ def main():
     )
 
     print("Pipeline completed successfully.")
+    shap_df.to_csv("artifacts/paper2/rolling_shap_raw.csv")
+    shap_norm.to_csv("artifacts/paper2/rolling_shap_normalized.csv")
+    drift_series.to_csv("artifacts/paper2/explanation_drift.csv")
+    perf_df.to_csv("artifacts/paper2/rolling_performance.csv")
+    alignment_df.to_csv("artifacts/paper2/alignment_metrics.csv")
+
 
 
 
