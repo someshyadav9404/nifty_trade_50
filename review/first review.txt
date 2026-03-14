@@ -1,0 +1,182 @@
+You did not get rejected.
+You got:
+
+Weak Accept (6)
+
+Weak Accept (6)
+
+One extremely low-effort Strong Reject (0)
+
+That means:
+👉 The idea is strong.
+👉 The execution is weak.
+👉 The paper is fixable.
+
+Now I’m going to decode the reviews in plain language and tell you exactly what to improve.
+
+🔎 What Reviewers Actually Mean (Translated)
+Core Message Across All Reviews
+
+All three reviewers are saying the same thing in different tones:
+
+“The idea is interesting, but the methodology and experiments are too weak for us to trust the claims.”
+
+That’s it.
+
+Not that the idea is bad.
+Not that it’s trivial.
+Not that it’s nonsense.
+
+It’s a rigor problem.
+
+🧠 Main Criticisms (Grouped Clearly)
+1️⃣ “Not formally specified / not reproducible”
+
+They are attacking this part:
+
+“Similarity is computed in explanation space…”
+
+But you never defined:
+
+What similarity metric? (cosine? euclidean?)
+
+How many historical trades?
+
+Is it kNN? centroid? clustering?
+
+What threshold?
+
+How is threshold selected?
+
+Is it fixed? tuned? optimized?
+
+Is it overfitted?
+
+Right now your method sounds like:
+
+“Compare explanation to profitable ones and reject if similar to bad ones.”
+
+That is conceptual.
+But reviewers want:
+
+Mathematical formalization.
+
+You need equations.
+
+2️⃣ “Few simulation results”
+
+This is absolutely correct.
+
+Your experiments:
+
+One market (NSEI)
+
+One model (Gradient Boosting)
+
+One cost setting (0.1%)
+
+One holding period (1 day)
+
+One train-test split
+
+No statistical testing
+
+No baseline filters
+
+That is too narrow.
+
+3️⃣ “No comparison with simpler baselines”
+
+This is the biggest technical weakness.
+
+They are asking:
+
+Why SHAP filtering? Why not simply:
+
+Confidence threshold?
+
+Probability threshold?
+
+Volatility filter?
+
+No-trade when uncertainty high?
+
+Reduce trades by random sampling?
+
+If your method performs similar to simple confidence filtering, then SHAP adds no value.
+
+You must compare against:
+
+Probability > 0.6 filter
+
+Top-k confidence trades
+
+Volatility filter
+
+Random rejection baseline
+
+Without this, your novelty is fragile.
+
+4️⃣ “Performance claims overstated”
+
+This one is serious.
+
+Look at your table:
+
+Baseline Sharpe: -1.31
+Proposed Sharpe: -0.88
+
+That is still negative.
+
+That means:
+You are losing money.
+
+But your abstract says:
+“Improves risk-adjusted performance.”
+
+Technically true.
+But academically weak.
+
+You are improving from bad to less bad.
+
+Reviewers noticed this.
+
+5️⃣ “Lack of statistical validation”
+
+You did not include:
+
+t-tests
+
+Bootstrap confidence intervals
+
+Significance of drawdown reduction
+
+Stability across years
+
+Finance reviewers expect statistical backing.
+
+6️⃣ “Writing clarity”
+
+This one is 100% valid.
+
+Your writing has:
+
+Grammar mistakes
+
+Repetition
+
+Informal tone
+
+Overclaiming
+
+Inconsistent Sharpe interpretation
+
+For example:
+
+“Sharpe ratio improves from 1.31 to 0.88”
+
+That is wrong.
+1.31 → 0.88 is decrease.
+And table shows negative values.
+
+This destroys reviewer confidence.

@@ -10,6 +10,9 @@ ART_DIR = "artifacts/paper1"
 preds = np.load(f"{ART_DIR}/preds.npy")          # {-1,0,1}
 confidence = np.load(f"{ART_DIR}/confidence.npy")
 dates = pd.read_csv(f"{ART_DIR}/dates.csv")
+print(type(dates))
+print(dates.head())
+
 
 df = pd.read_csv("data/labeled/nifty_labeled.csv")
 df["Date"] = pd.to_datetime(df["Date"])
@@ -38,13 +41,13 @@ for i in range(len(preds) - 1):
     # No trade
     if signal == 0:
         equity.append(equity[-1])
-        continue
+        
 
     entry_price = prices[i]
     exit_price = prices[i + 1]
 
     raw_ret = signal * (exit_price - entry_price) / entry_price
-    net_ret = raw_ret - COST
+    net_ret = raw_ret - COST*signal**2  # cost only applies if we take a position
 
     new_equity = equity[-1] * (1 + net_ret)
     equity.append(new_equity)

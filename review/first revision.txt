@@ -1,0 +1,144 @@
+🔧 REVISION PLAN (Concrete)
+Step 1: Formalize the Method
+
+Add mathematical definition:
+
+Let:
+
+E⁺ = explanation vectors of profitable trades
+
+E⁻ = explanation vectors of losing trades
+
+e* = candidate explanation
+
+Define similarity:
+
+Cosine similarity:
+
+S⁺(e*) = average cosine similarity between e* and E⁺
+S⁻(e*) = average cosine similarity between e* and E⁻
+
+Decision rule:
+
+Execute trade if:
+
+S⁺(e*) − S⁻(e*) > τ
+
+Where τ is threshold selected via validation.
+
+Now it becomes scientific.
+
+Step 2: Add Baseline Filters
+
+Add at least 3:
+
+Probability threshold baseline
+
+Random trade reduction baseline
+
+Volatility filter baseline
+
+Then show your method performs better.
+
+This is mandatory.
+
+Step 3: Add Robustness Checks
+
+At minimum:
+
+Try transaction cost = 0.05%, 0.2%
+
+Try window 2013–2018 train, 2019–2023 test
+
+Try different holding period
+
+Even small robustness analysis increases credibility massively.
+
+Step 4: Fix Metric Interpretation
+
+If Sharpe is negative:
+
+Say clearly:
+
+“Although still negative, risk-adjusted performance improves significantly relative to baseline.”
+
+Be honest.
+Reviewers respect honesty.
+
+Step 5: Improve Writing Quality
+
+You must:
+
+Remove grammatical errors
+
+Tighten sentences
+
+Remove repetition
+
+Avoid emotional tone
+
+It must sound controlled and analytical.
+
+🚨 About Reviewer 3’s Suggested References
+
+The medical ML references are irrelevant to your topic.
+
+That is likely template spam suggestion.
+
+Ignore them.
+
+Add instead:
+
+Papers on confidence-based trade filtering
+
+Papers on uncertainty in trading
+
+Papers on model rejection options
+
+📊 Realistic Assessment
+
+Your paper is:
+
+Strong idea
+Weak execution
+Fixable
+
+You are not far from acceptance.
+
+But you need:
+
+More rigor
+More baselines
+Clear math
+Better writing
+
+🧠 Important Perspective
+
+For a first paper, getting:
+
+Two Weak Accepts
+
+Is actually very good.
+
+It means:
+Your research intuition is strong.
+Your execution maturity needs work.
+
+That’s normal at MTech level.
+
+🎯 If You Want
+
+I can now:
+
+Help you mathematically formalize your SHAP filtering
+
+Design 3 simple baselines to add quickly
+
+Rewrite your abstract to avoid overclaim
+
+Help you draft a revision response to reviewers
+
+This is no longer about formatting.
+Now it’s about turning a promising idea into a defensible paper.
+
+And that is a far more interesting challenge.

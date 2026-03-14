@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import joblib
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
@@ -11,7 +12,7 @@ def train_models():
     df["Date"] = pd.to_datetime(df["Date"])
 
     # Time-based split
-    train_df = df["2013-01-21"> df["Date"] < "2020-01-01"]
+    train_df = df[(df["Date"] > "2013-01-21") & (df["Date"] < "2020-01-01")]
     test_df  = df[df["Date"] >= "2020-01-01"]
 
     X_train = train_df.drop(columns=["label", "next_ret", "Date"])
@@ -19,6 +20,9 @@ def train_models():
 
     X_test  = test_df.drop(columns=["label", "next_ret", "Date"])
     y_test  = test_df["label"]
+
+    test_returns = test_df["next_ret"].values
+
 
     # ================= Random Forest =================
     print("\n========== Training Random Forest ==========")
@@ -29,14 +33,32 @@ def train_models():
         random_state=42,
         n_jobs=-1
     )
+    print(train_df["label"].value_counts())
+    print(test_df["label"].value_counts())
 
     rf.fit(X_train, y_train)
     preds_rf = rf.predict(X_test)
+    print(preds_rf)
+    print(rf.classes_)
+    probs = rf.predict_proba(X_test)
+    print(probs)
+    confidence = probs[np.arange(len(preds_rf)), preds_rf+1]
+    print(np.arange(len(preds_rf)))
+    print("Confidence scores for Random Forest predictions:")
+    print(confidence)
 
     print("Random Forest Classification Report:")
     print(classification_report(y_test, preds_rf))
 
-    joblib.dump(rf, "models/random_forest_paper1.pkl")
+    joblib.dump(
+        {
+            "model": rf,
+            "X_test": X_test,
+            "preds": preds_rf,
+            "returns": test_returns
+        },
+        "models/random_forest_paper1.pkl"
+    )
     print("Saved Random Forest model.")
 
     # ================= XGBoost =================
@@ -69,5 +91,7 @@ def train_models():
     joblib.dump(xgb, "models/xgboost_paper1_frozen.pkl")
     print("Saved XGBoost model.")
 
+    return rf ,X_test, preds_rf, test_returns
+
 if __name__ == "__main__":
-    train_models()
+    rf ,X_test, preds_rf, test_returns = train_models()
