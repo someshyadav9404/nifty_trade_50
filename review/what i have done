@@ -1,0 +1,11 @@
+first download dataset
+then remove the dates and dataset where there is volume not present
+then divide the dataset into train test split
+now two models are trained on the training datasett
+now they make prediction and generate signals 
+the signals are tested in backtesting engine where the position is persistence to create less trades 
+used three class classification(-1 , 0 1) for reducing fast position switch to remove extra transaction cost
+every day the trade is taken whether it show hold and the change is shown in pnl for that day
+we found optimal confidence on the training dataset and impplement on the testing dataset
+the baseline and confidence is run over the three transaction costs 
+the shap is also calculated on the training datasert and then implemented on the test DATASET which helps to detect which trade is similar to th bad trade from the training data and it is neglectwd 

@@ -50,15 +50,8 @@ def train_models():
     print("Random Forest Classification Report:")
     print(classification_report(y_test, preds_rf))
 
-    joblib.dump(
-        {
-            "model": rf,
-            "X_test": X_test,
-            "preds": preds_rf,
-            "returns": test_returns
-        },
-        "models/random_forest_paper1.pkl"
-    )
+    joblib.dump(rf, "models/random_forest_paper1.pkl")
+    
     print("Saved Random Forest model.")
 
     # ================= XGBoost =================

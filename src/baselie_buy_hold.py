@@ -1,17 +1,56 @@
 import pandas as pd
-from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
 
-path = Path("data/raw/nifty_clean.csv")  # change file if needed
-df = pd.read_csv(path)
-# skip first row if it contains labels/metadata (do not compute on it)
-if len(df) > 0:
-    df = df.iloc[1:].reset_index(drop=True)
-for col in ("close","Close","adj_close","Adj Close","ClosePrice","close_price"):
-    if col in df.columns:
-        closes = df[col].astype(float)
-        break
-else:
-    raise SystemExit("No close column found; update column name")
+DATA_PATH = "data/labeled/nifty_labeled.csv"
 
-buy_hold_pct = (closes.iloc[-1] / closes.iloc[0] - 1) * 100
-print(f"Buy-and-hold return: {buy_hold_pct:.2f}%")
+# -----------------------------
+# Load data
+# -----------------------------
+df = pd.read_csv(DATA_PATH)
+
+df["Date"] = pd.to_datetime(df["Date"])
+
+# Use same test period as your ML models
+test_df = df[df["Date"] >= "2020-01-01"].reset_index(drop=True)
+
+dates = test_df["Date"]
+close = test_df["Close"]
+
+# -----------------------------
+# Compute Buy & Hold
+# -----------------------------
+returns = close.pct_change().fillna(0)
+
+equity_curve = (1 + returns).cumprod()
+
+buy_hold_df = pd.DataFrame({
+    "date": dates,
+    "close": close,
+    "return": returns,
+    "equity": equity_curve
+})
+
+# save results
+buy_hold_df.to_csv(
+    "artifacts/paper1/buy_hold_equity.csv",
+    index=False
+)
+
+print("Final Buy & Hold Equity:", equity_curve.iloc[-1])
+print("Total Return %:", (equity_curve.iloc[-1] - 1) * 100)
+
+# -----------------------------
+# Plot Buy & Hold
+# -----------------------------
+plt.figure(figsize=(10,6))
+
+plt.plot(dates, equity_curve, label="Buy & Hold NIFTY", color="black")
+
+plt.title("Buy & Hold Equity Curve (NIFTY)")
+plt.xlabel("Date")
+plt.ylabel("Equity (Start = 1)")
+plt.legend()
+plt.grid(True)
+
+plt.show()

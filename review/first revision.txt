@@ -142,3 +142,427 @@ This is no longer about formatting.
 Now it’s about turning a promising idea into a defensible paper.
 
 And that is a far more interesting challenge.
+
+
+
+
+
+
+
+
+1. “Method not formally specified / not reproducible”
+
+This is the biggest criticism.
+
+Right now your method probably reads like:
+
+“We reject trades whose SHAP explanations resemble losing trades.”
+
+But reviewers want something precise.
+
+You must add a formal algorithm description.
+
+For example in the paper:
+
+Algorithm: Explanation-Aware Trade Filter
+
+Input:
+prediction 
+𝑦
+𝑡
+y
+t
+	​
+
+, SHAP vector 
+𝑠
+𝑡
+s
+t
+	​
+
+, training explanation sets
+
+Steps:
+
+Compute trade outcome on training set
+
+𝑟
+𝑡
+=
+𝑦
+𝑡
+⋅
+𝑟
+𝑒
+𝑡
+𝑢
+𝑟
+𝑛
+𝑡
+r
+t
+	​
+
+=y
+t
+	​
+
+⋅return
+t
+	​
+
+
+Split SHAP explanations
+
+Winning set
+
+𝑆
++
+=
+{
+𝑠
+𝑡
+:
+𝑟
+𝑡
+>
+0
+}
+S
++
+={s
+t
+	​
+
+:r
+t
+	​
+
+>0}
+
+Losing set
+
+𝑆
+−
+=
+{
+𝑠
+𝑡
+:
+𝑟
+𝑡
+≤
+0
+}
+S
+−
+={s
+t
+	​
+
+:r
+t
+	​
+
+≤0}
+
+Compute centroids
+
+𝑐
++
+=
+1
+∣
+𝑆
++
+∣
+∑
+𝑠
+𝑖
+c
++
+=
+∣S
++
+∣
+1
+	​
+
+∑s
+i
+	​
+
+𝑐
+−
+=
+1
+∣
+𝑆
+−
+∣
+∑
+𝑠
+𝑖
+c
+−
+=
+∣S
+−
+∣
+1
+	​
+
+∑s
+i
+	​
+
+
+For a new trade explanation 
+𝑠
+s
+
+𝑠
+𝑖
+𝑚
+𝑤
+𝑖
+𝑛
+=
+𝑐
+𝑜
+𝑠
+𝑖
+𝑛
+𝑒
+(
+𝑠
+,
+𝑐
++
+)
+sim
+win
+	​
+
+=cosine(s,c
++
+)
+𝑠
+𝑖
+𝑚
+𝑙
+𝑜
+𝑠
+𝑒
+=
+𝑐
+𝑜
+𝑠
+𝑖
+𝑛
+𝑒
+(
+𝑠
+,
+𝑐
+−
+)
+sim
+lose
+	​
+
+=cosine(s,c
+−
+)
+
+Decision rule
+
+if sim_lose > sim_win:
+    reject trade
+else:
+    execute trade
+
+This makes the method reproducible.
+
+2. “No comparison with simple baselines”
+
+You already partially fixed this.
+
+Your comparisons now include:
+
+Baseline ML
+Confidence filter
+SHAP filter
+
+That directly answers this reviewer comment:
+
+similar benefits may be achievable with simpler filtering methods
+
+Now show them side-by-side in a table.
+
+Example structure:
+
+Strategy	Equity	Sharpe	Drawdown	Trades
+Baseline	0.49	-0.56	-0.64	229
+Confidence	0.53	-0.50	-0.61	213
+SHAP	0.95	0.05	-0.56	149
+
+Now the reviewer can clearly see:
+
+SHAP improves risk metrics and trade count.
+
+3. “Single market / single experiment”
+
+You don't necessarily need another market if time is short. Instead add robustness tests.
+
+Three easy robustness experiments:
+
+A. Different transaction costs
+
+Run with
+
+0.00025
+0.0005
+0.001
+
+Show that SHAP filtering still reduces trades.
+
+B. Different train/test splits
+
+Example:
+
+2013–2018 train
+2019–2024 test
+
+or
+
+rolling windows
+
+This proves the filter isn't overfit.
+
+C. Different confidence thresholds
+
+You already added threshold search on training data, which helps here.
+
+Mention it clearly.
+
+4. “No statistical validation”
+
+You don't need heavy statistics.
+
+Add a simple bootstrap test on returns.
+
+Example:
+
+Resample daily returns 1000 times and compute Sharpe distribution.
+
+Then report:
+
+Sharpe improvement significant at p < 0.05
+
+Even a simple test dramatically improves credibility.
+
+5. “Performance claims overstated”
+
+Reviewers noticed negative Sharpe.
+
+So adjust your wording.
+
+Bad claim:
+
+The strategy is profitable.
+
+Better claim:
+
+Explanation-aware filtering significantly improves risk-adjusted performance and reduces overtrading compared to baseline ML trading strategies.
+
+Now the claim matches the evidence.
+
+6. Improve writing clarity
+
+They complained about writing.
+
+Three sections need to be tightened:
+
+Methodology
+
+Add pseudocode.
+
+Experiment setup
+
+Explain:
+
+dataset
+train/test split
+transaction costs
+models
+features
+
+Metrics
+
+Define:
+
+Sharpe
+drawdown
+equity
+
+7. Add one key figure
+
+Right now the paper likely has equity curves.
+
+Add this plot:
+
+Trade count vs threshold
+
+This visually shows the effect of filtering.
+
+8. Explain why SHAP works
+
+Add a short explanation:
+
+Weak explanations correspond to low feature consensus, meaning the model's decision boundary is unstable.
+
+Filtering these trades removes noisy predictions.
+
+That strengthens the conceptual contribution.
+
+What reviewers actually think right now
+
+Reviewer 1:
+Interesting idea, but weak experiments.
+
+Reviewer 2:
+Not enough experiments.
+
+Reviewer 3:
+Promising but needs rigor.
+
+So the paper is not fundamentally rejected for the idea.
+
+It is rejected for lack of experimental depth.
+
+If you add the following 5 things, acceptance probability increases a lot
+
+Formal algorithm description
+
+Baseline comparison table
+
+Robustness experiment (cost or split)
+
+Simple statistical test
+
+Clearer explanation of method
+
+One important observation
+
+Your RF SHAP result is actually very interesting:
+
+baseline equity ≈ 0.49
+SHAP equity ≈ 0.95
+
+That’s a huge improvement in decision quality.
+
+If you present it correctly, reviewers will notice.
+
+If you want, I can also show you 3 small additional experiments (about 40 lines of code total) that would almost completely eliminate the reviewers’ technical complaints.
